@@ -5,21 +5,7 @@ import requests
 import sys
 import urlparse
 from bs4 import BeautifulSoup
-
-# from optparse import OptionParser
-# def main():
-# 	parser = OptionParser()
-# 	parser.add_option("-u", dest="url",help="The destation url for attack")
-# 	(options, args) = parser.parse_args()
-# 	if len(args) != 0:
-# 	    parser.error("incorrect number of arguments")  
-# 	if options.url:
-
-# url = sys.argv[1]
-url = "http://127.0.0.1/"
-url = "http://gxxnr.cn/"
-url = "http://www.cnblogs.com/"
-# parsedUrl = urlparse(url_str)
+from optparse import OptionParser
 
 def urlParser(url):
 	result = {}
@@ -181,14 +167,25 @@ def mergeSameQuery(links):
 		results.append(tempResult)
 	return results
 
+def formateUrl(url):
+	if not url.endswith("/"):
+		url += "/"
+	return url
+
 def main():
-	content = getContent(url)
-	soup = BeautifulSoup(content, "html.parser")
-	links = getAllLinks(soup)
-	hrefs = getAllHerfs(links)
-	links = hrefsFilter(hrefs, getSchemeDomainPort(url))
-	for link in links:
-		print link
+	if len(sys.argv) != 2:
+		print "Usage : \n\tpython " + sys.argv[0] + " [URL]"
+		print "Example : \n\tpython " + sys.argv[0] + " \"http://www.jianshu.com/\""
+	else:
+		url = formateUrl(sys.argv[1])
+		content = getContent(url)
+		soup = BeautifulSoup(content, "html.parser")
+		links = getAllLinks(soup)
+		hrefs = getAllHerfs(links)
+		links = hrefsFilter(hrefs, getSchemeDomainPort(url))
+		for link in links:
+			print link
+		return links
 
 if __name__ == "__main__":
     main()
