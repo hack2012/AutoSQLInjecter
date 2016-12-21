@@ -112,8 +112,17 @@ def hrefsFilter(links, domain):
 	# links = getAllSameFatherDomainLinks(links) # 获取所有子域名下的所有链接
 	links = getAllSameSourceLinks(links) # 获取同源策略下的所有链接
 	links = getAllQueryLinks(links) # 获取具有查询功能的URL
+	links.add("http://127.0.0.1/index.php?id=1")
+	links.add("http://127.0.0.1/index.php?id=2&id=1&fuck=dstemplink")
+	links.add("http://127.0.0.1/index.php?id=3")
+	links.add("http://127.0.0.1/index.php?id=4")
+	links.add("http://127.0.0.1/index.php?id=5")
+	links.add("http://127.0.0.1/index.php?ids=5")
+	links.add("http://127.0.0.1/indexs.php?is=1")
+	links.add("http://127.0.0.1/indexs.php?id=1")
 	links = getAllTrueQueryLinks(links) # 这个函数是为了防止 xxx.css?v=xxx 这种情况出现的 , 使用黑名单进行过滤
-	print links
+	links = analyseAllLinks(links)
+	links = mergeSameQuery(links)
 	return links
 
 
@@ -139,13 +148,73 @@ def getAllTrueQueryLinks(links):
 			tempLinks.add(link)
 	return tempLinks
 
+def analyseAllLinks(links):
+	# 从URL中提取查询的文件和查询参数
+	result = []
+	for link in links:
+		templink = link.split("?")[0]
+		tempQuery = link.split("?")[1]
+		tempResult = {}
+		tempResult['url'] = templink
+		queryResult = {}
+		temptempQueries = tempQuery.split("&")
+		for temptempQuery in temptempQueries:
+			temptemptempKey = temptempQuery.split("=")[0] # 其中一个参数的键
+			temptemptempValue = temptempQuery.split("=")[1] # 其中一个参数的值
+			queryResult[temptemptempKey] = temptemptempValue
+		tempResult['value'] = queryResult
+		# queryResult = []
+		# temptempQueries = tempQuery.split("&")
+		# for temptempQuery in temptempQueries:
+		# 	temptemptempKey = temptempQuery.split("=")[0] # 其中一个参数的键
+		# 	# 判断这个键是不是已经存在了 , 这个地方写的比较乱 , 防止参数污染 ? 
+		# 	SIGN = True
+		# 	for _query in queryResult:
+		# 		if _query['key'] == temptemptempKey:
+		# 			SIGN = False
+		# 			break
+		# 	if not SIGN:
+		# 		break
+		# 	temptemptempValue = temptempQuery.split("=")[1] # 这个参数的值
+		# 	temptemptempReuslt = {}
+		# 	temptemptempReuslt['key'] = temptemptempKey
+		# 	temptemptempReuslt['value'] = temptemptempValue
+		# 	queryResult.append(temptemptempReuslt)
+		result.append(tempResult)
+	return result
+
+def mergeSameQuery(links):
+	# 合并具有相同的查询参数的相同文件
+	results = []
+	for link in links:
+		tempResult = {}
+		tempResult['url'] = link['url']
+		SIGN = False
+		for result in results:
+			keysOfValueResult = []
+			for res in result['value']:
+				keysOfValueResult.append(res)
+			keysOfValueLink = []
+			for lin in link['value']:
+				keysOfValueLink.append(lin)
+			if link['url'] == result['url'] and keysOfValueLink == keysOfValueResult:
+				SIGN = True
+				break
+		if SIGN:
+			continue
+		tempResult['value'] = link['value']
+		results.append(tempResult)
+	return results
+
 def main():
-	content = getContent(url)
+	# content = getContent(url)
+	content = "<html></html>"
 	soup = BeautifulSoup(content, "html.parser")
 	links = getAllLinks(soup)
 	hrefs = getAllHerfs(links)
 	links = hrefsFilter(hrefs, getSchemeDomainPort(url))
-	print links
+	for link in links:
+		print link
 
 if __name__ == "__main__":
     main()
