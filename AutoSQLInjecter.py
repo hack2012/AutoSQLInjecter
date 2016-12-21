@@ -18,6 +18,7 @@ from bs4 import BeautifulSoup
 # url = sys.argv[1]
 url = "http://127.0.0.1/"
 url = "http://gxxnr.cn/"
+url = "http://www.cnblogs.com/qq78292959/archive/2013/04/07/3005763.html"
 # parsedUrl = urlparse(url_str)
 
 def urlParser(url):
@@ -31,6 +32,10 @@ def urlParser(url):
 	else:
 		result['port'] = tempurl.port
 	return result
+
+def getSchemeDomainPort(url):
+	tempurl = urlparse.urlparse(url)
+	return tempurl.scheme + "://" + tempurl.hostname + "/"
 
 def getContent(url):
 	return requests.get(url).text
@@ -84,14 +89,13 @@ def getAllSameSourceLinks(links):
 			result.add(link)
 	return result
 
-def getCompleteLinks(links):
-	global url
+def getCompleteLinks(links, domain):
 	result = set()
 	for link in links:
 		if not (link.startswith("http://") or link.startswith("https://")):
-			result.add(url + link)
+			result.add(domain + link)
 		else:
-			result.add(url)
+			result.add(link)
 	return result
 
 def removeAllAnchors(links):
@@ -102,14 +106,20 @@ def removeAllAnchors(links):
 		result.add(link)
 	return result
 
-def hrefsFilter(links):
+def hrefsFilter(links, domain):
 	links = removeAllAnchors(links)
-	links = getCompleteLinks(links)
-	links = getAllSameFatherDomainLinks(links)
+	links = getCompleteLinks(links, domain)
+	print links
+	print "---------------"
+	# links = getAllSameFatherDomainLinks(links)
+	# print links
+	print "---------------"
 	links = getAllSameSourceLinks(links)
+	print links
+	print "---------------"
 	# 这个时候可以去写爬虫去判断
 	# links = getAllQueryLinks(links)
-	return links
+	# return links
 
 
 def getAllQueryLinks(links):
@@ -124,7 +134,7 @@ def main():
 	soup = BeautifulSoup(content, "html.parser")
 	links = getAllLinks(soup)
 	hrefs = getAllHerfs(links)
-	links = hrefsFilter(hrefs)
+	links = hrefsFilter(hrefs, getSchemeDomainPort(url))
 	print links
 
 if __name__ == "__main__":
