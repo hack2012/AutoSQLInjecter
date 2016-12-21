@@ -18,7 +18,7 @@ from bs4 import BeautifulSoup
 # url = sys.argv[1]
 url = "http://127.0.0.1/"
 url = "http://gxxnr.cn/"
-url = "http://www.cnblogs.com/qq78292959/archive/2013/04/07/3005763.html"
+url = "http://www.cnblogs.com/"
 # parsedUrl = urlparse(url_str)
 
 def urlParser(url):
@@ -112,14 +112,6 @@ def hrefsFilter(links, domain):
 	# links = getAllSameFatherDomainLinks(links) # 获取所有子域名下的所有链接
 	links = getAllSameSourceLinks(links) # 获取同源策略下的所有链接
 	links = getAllQueryLinks(links) # 获取具有查询功能的URL
-	links.add("http://127.0.0.1/index.php?id=1")
-	links.add("http://127.0.0.1/index.php?id=2&id=1&fuck=dstemplink")
-	links.add("http://127.0.0.1/index.php?id=3")
-	links.add("http://127.0.0.1/index.php?id=4")
-	links.add("http://127.0.0.1/index.php?id=5")
-	links.add("http://127.0.0.1/index.php?ids=5")
-	links.add("http://127.0.0.1/indexs.php?is=1")
-	links.add("http://127.0.0.1/indexs.php?id=1")
 	links = getAllTrueQueryLinks(links) # 这个函数是为了防止 xxx.css?v=xxx 这种情况出现的 , 使用黑名单进行过滤
 	links = analyseAllLinks(links)
 	links = mergeSameQuery(links)
@@ -190,8 +182,7 @@ def mergeSameQuery(links):
 	return results
 
 def main():
-	# content = getContent(url)
-	content = "<html></html>"
+	content = getContent(url)
 	soup = BeautifulSoup(content, "html.parser")
 	links = getAllLinks(soup)
 	hrefs = getAllHerfs(links)
