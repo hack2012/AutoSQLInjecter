@@ -76,6 +76,9 @@ def getAllSameSourceLinks(links,url):
 def getCompleteLinks(links, domain):
 	result = set()
 	for link in links:
+		if link.startswith("//"): # 解决有的URL是以//开头的的BUG , 这种情况并不是当前域名下的子文件夹
+			link = "http:" + link
+			continue
 		if not (link.startswith("http://") or link.startswith("https://")):
 			result.add(domain + link)
 		else:
@@ -91,14 +94,30 @@ def removeAllAnchors(links):
 	return result
 
 def hrefsFilter(links, url):
+	print "--------Removeing all anchors...",
 	links = removeAllAnchors(links)
+	print "Success!"
+	print "--------Fixing miss scheme...",
 	links = getCompleteLinks(links, url)
+	print "Success!"
+	print "--------Filtering all same father doamain links...",
 	# links = getAllSameFatherDomainLinks(links, url) # 获取所有子域名下的所有链接
+	print "Success!"
+	print "--------Filtering all same source links...",
 	links = getAllSameSourceLinks(links,url) # 获取同源策略下的所有链接
+	print "Success!"
+	print "--------Flitering all urls which is able to query...",
 	links = getAllQueryLinks(links) # 获取具有查询功能的URL
+	print "Success!"
+	print "--------Flitering urls such as : 'xxx.css?v=xxx'...",
 	links = getAllTrueQueryLinks(links) # 这个函数是为了防止 xxx.css?v=xxx 这种情况出现的 , 使用黑名单进行过滤
+	print "Success!"
+	print "--------Getting all pathes and parameters...",
 	links = analyseAllLinks(links)
+	print "Success!"
+	print "--------Merge the same pathes and parameters...",
 	links = mergeSameQuery(links)
+	print "Success!"
 	return links
 
 
@@ -166,6 +185,8 @@ def mergeSameQuery(links):
 	return results
 
 def formateUrl(url):
+	if not (url.startswith("http://") or url.startswith("https://")):
+		url = "http://" + url
 	if not url.endswith("/"):
 		url += "/"
 	return url
@@ -175,12 +196,28 @@ def main():
 		print "Usage : \n\tpython " + sys.argv[0] + " [URL]"
 		print "Example : \n\tpython " + sys.argv[0] + " \"http://www.jianshu.com/\""
 	else:
+		print "================Log================"
 		url = formateUrl(sys.argv[1])
+		print "Getting content of this url...",
 		content = getContent(url)
+		print "Success!"
+		print "---------------------------"
+		print "Creating document tree...",
 		soup = BeautifulSoup(content, "html.parser")
+		print "Success!"
+		print "---------------------------"
+		print "Finding all : <a herf=''></a>...",
 		links = getAllLinks(soup)
+		print "Success!"
+		print "---------------------------"
+		print "Getting all of the href value...",
 		hrefs = getAllHerfs(links)
+		print "Success!"
+		print "---------------------------"
+		print "Filtering valunable url..."
 		links = hrefsFilter(hrefs, url)
+		print "Success!"
+		print "=============Result=============="
 		for link in links:
 			print link
 		return links
