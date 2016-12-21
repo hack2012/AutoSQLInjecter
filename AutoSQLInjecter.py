@@ -163,23 +163,6 @@ def analyseAllLinks(links):
 			temptemptempValue = temptempQuery.split("=")[1] # 其中一个参数的值
 			queryResult[temptemptempKey] = temptemptempValue
 		tempResult['value'] = queryResult
-		# queryResult = []
-		# temptempQueries = tempQuery.split("&")
-		# for temptempQuery in temptempQueries:
-		# 	temptemptempKey = temptempQuery.split("=")[0] # 其中一个参数的键
-		# 	# 判断这个键是不是已经存在了 , 这个地方写的比较乱 , 防止参数污染 ? 
-		# 	SIGN = True
-		# 	for _query in queryResult:
-		# 		if _query['key'] == temptemptempKey:
-		# 			SIGN = False
-		# 			break
-		# 	if not SIGN:
-		# 		break
-		# 	temptemptempValue = temptempQuery.split("=")[1] # 这个参数的值
-		# 	temptemptempReuslt = {}
-		# 	temptemptempReuslt['key'] = temptemptempKey
-		# 	temptemptempReuslt['value'] = temptemptempValue
-		# 	queryResult.append(temptemptempReuslt)
 		result.append(tempResult)
 	return result
 
