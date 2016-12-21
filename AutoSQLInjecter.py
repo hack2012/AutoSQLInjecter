@@ -109,23 +109,33 @@ def removeAllAnchors(links):
 def hrefsFilter(links, domain):
 	links = removeAllAnchors(links)
 	links = getCompleteLinks(links, domain)
+	# links = getAllSameFatherDomainLinks(links) # 获取所有子域名下的所有链接
+	links = getAllSameSourceLinks(links) # 获取同源策略下的所有链接
+	links = getAllQueryLinks(links) # 获取具有查询功能的URL
+	links = getAllTrueQueryLinks(links) # 这个函数是为了防止 xxx.css?v=xxx 这种情况出现的 , 使用黑名单进行过滤
 	print links
-	print "---------------"
-	# links = getAllSameFatherDomainLinks(links)
-	# print links
-	print "---------------"
-	links = getAllSameSourceLinks(links)
-	print links
-	print "---------------"
-	# 这个时候可以去写爬虫去判断
-	# links = getAllQueryLinks(links)
-	# return links
+	return links
 
 
 def getAllQueryLinks(links):
 	tempLinks = set()
 	for link in links:
 		if "?" in link:
+			tempLinks.add(link)
+	return tempLinks
+
+def getAllTrueQueryLinks(links):
+	blackList = ['css','js','html','htm','shtml']
+	tempLinks = set()
+	for link in links:
+		fileUrl = link.split("?")[0]
+		quertUrl = link.split("?")[1]
+		SIGN = True
+		for black in blackList:
+			if fileUrl.endswith(black):
+				SIGN = False
+				break
+		if SIGN:
 			tempLinks.add(link)
 	return tempLinks
 
