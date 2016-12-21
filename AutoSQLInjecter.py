@@ -59,16 +59,14 @@ def judgeSameFatherDomain(url1,url2):
 	else:
 		return False
 
-def getAllSameFatherDomainLinks(links):
-	global url
+def getAllSameFatherDomainLinks(links,url):
 	result = set()
 	for link in links:
 		if judgeSameFatherDomain(link, url):
 			result.add(link)
 	return result
 
-def getAllSameSourceLinks(links):
-	global url
+def getAllSameSourceLinks(links,url):
 	result = set()
 	for link in links:
 		if judgeSameSource(link, url):
@@ -92,11 +90,11 @@ def removeAllAnchors(links):
 		result.add(link)
 	return result
 
-def hrefsFilter(links, domain):
+def hrefsFilter(links, url):
 	links = removeAllAnchors(links)
-	links = getCompleteLinks(links, domain)
-	# links = getAllSameFatherDomainLinks(links) # 获取所有子域名下的所有链接
-	links = getAllSameSourceLinks(links) # 获取同源策略下的所有链接
+	links = getCompleteLinks(links, url)
+	# links = getAllSameFatherDomainLinks(links, url) # 获取所有子域名下的所有链接
+	links = getAllSameSourceLinks(links,url) # 获取同源策略下的所有链接
 	links = getAllQueryLinks(links) # 获取具有查询功能的URL
 	links = getAllTrueQueryLinks(links) # 这个函数是为了防止 xxx.css?v=xxx 这种情况出现的 , 使用黑名单进行过滤
 	links = analyseAllLinks(links)
@@ -182,7 +180,7 @@ def main():
 		soup = BeautifulSoup(content, "html.parser")
 		links = getAllLinks(soup)
 		hrefs = getAllHerfs(links)
-		links = hrefsFilter(hrefs, getSchemeDomainPort(url))
+		links = hrefsFilter(hrefs, url)
 		for link in links:
 			print link
 		return links
