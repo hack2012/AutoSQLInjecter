@@ -50,7 +50,6 @@ for line in rules:
         continue
     line = line.replace("\r","")
     line = line.replace("\n","")
-    print "Trying : " + line
     line = urlEncodeAllChar(line)
     startTemp = line.split(urlEncodeAllChar("()"))[0]
     endTemp = line.split(urlEncodeAllChar("()"))[1]
@@ -83,7 +82,6 @@ for line in rules:
         payloads.append(line)
         counter += 1
         print payload
-        break
 print "----------------------"
 print counter," valunable found!"
 print "----------------------"
